@@ -33,7 +33,8 @@ void main (string[] args) {
 
     // Creating pipeline and elements
     var pipeline = new Pipeline ("test");
-    dynamic Element filesrc  = createElement("filesrc", "filesrc");
+    //dynamic Element filesrc  = createElement("filesrc", "filesrc");
+    dynamic Element filesrc  = createElement("dtmfsrc", "dtmfsrc");
     dynamic Element decodebin = createElement ("decodebin", "decodebin");
     dynamic Element audioresample = createElement ("audioresample", "audioresample");
     dynamic Element audioconvert = createElement ("audioconvert", "audioconvert");
@@ -140,6 +141,35 @@ void main (string[] args) {
         default:
             break;
         }
+
+        return true;
+    });
+
+    var on_off = 0;
+    var number = 0;
+
+    GLib.Timeout.add(250, () => {
+        //print("timeout\n");
+        Gst.Structure s = new Gst.Structure.empty("dtmf-event");
+        s.set_value("type", 1);
+        s.set_value("number", number);
+        s.set_value("volume", 25);
+
+        if(on_off == 0) {
+            s.set_value("start", true);
+            on_off = 1;
+        } else {
+            s.set_value("start", false);
+            number++;
+            if(number> 15) {
+                number = 0;
+            }
+            on_off = 0;
+        }
+
+        //stdout.printf("number=%u, on_off=%u\n", number, on_off);
+        Gst.Event event = new Gst.Event.custom(Gst.EventType.CUSTOM_UPSTREAM, s.copy());
+        pipeline.send_event(event);
 
         return true;
     });
