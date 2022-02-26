@@ -1,2 +1,2 @@
 all:
-	valac --pkg gstreamer-1.0 test.vala
+	valac -g --pkg gstreamer-1.0 test.vala

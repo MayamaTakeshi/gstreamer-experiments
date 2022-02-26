@@ -64,7 +64,7 @@ void main (string[] args) {
 
 		// Check the new pad's type:
 		Gst.Caps new_pad_caps = new_pad.query_caps (null);
-		weak Gst.Structure new_pad_struct = new_pad_caps.get_structure (0);
+		weak Gst.Structure new_pad_struct = new_pad_caps.get_structure(0);
 		string new_pad_type = new_pad_struct.get_name ();
 		if (!new_pad_type.has_prefix ("audio/x-raw")) {
 			print ("  It has type '%s' which is not raw audio. Ignoring.\n", new_pad_type);
@@ -101,7 +101,11 @@ void main (string[] args) {
         var src_obj = message.src;
 
         if (src_obj == dtmfdetect) {
-            print("Got message #%u from %s: %s\n", seqnum, "dtmfdetect", "");
+            if(message.get_structure().get_name() != "GstMessageStateChanged") {
+                weak Gst.Structure s = message.get_structure();
+                var n = s.get_value("number").strdup_contents();
+                print("Got message #%u %s from %s: %s\n", seqnum, message.get_structure().get_name(),"dtmfdetect", n);
+            }
         }
 
         switch (message.type) {
