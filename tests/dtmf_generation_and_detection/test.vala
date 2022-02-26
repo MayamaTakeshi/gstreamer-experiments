@@ -101,10 +101,13 @@ void main (string[] args) {
         var src_obj = message.src;
 
         if (src_obj == dtmfdetect) {
-            if(message.get_structure().get_name() != "GstMessageStateChanged") {
-                weak Gst.Structure s = message.get_structure();
-                var n = s.get_value("number").strdup_contents();
-                print("Got message #%u %s from %s: %s\n", seqnum, message.get_structure().get_name(),"dtmfdetect", n);
+            weak Gst.Structure s = message.get_structure();
+            var name = s.get_name();
+            if(name != "GstMessageStateChanged") {
+                var type = s.get_value("type").strdup_contents();
+                var number = s.get_value("number").strdup_contents();
+                var method = s.get_value("method").strdup_contents();
+                print("Got message #%u %s from dtmfdetect: type=%s number=%s method=%s\n", seqnum, name, type, number, method);
             }
         }
 
