@@ -130,11 +130,9 @@ void main (string[] args) {
     });
 
 
-    /* add watch for dtmfdetect messages */
+    /* add watch for dtmfdetect messages (but not working yet) */
     Bus dd_bus = dtmfdetect.get_bus ();
-    
-
-    dd_bus.add_watch (1, (bus, message) =>{
+    dd_bus.add_watch (1, (bus, message) => {
         switch (message.type) {
         case MessageType.ERROR:
             GLib.Error err;
