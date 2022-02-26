@@ -38,8 +38,8 @@ void main (string[] args) {
     dynamic Element audioresample = createElement ("audioresample", "audioresample");
     dynamic Element audioconvert = createElement ("audioconvert", "audioconvert");
     dynamic Element dtmfdetect = createElement ("dtmfdetect", "dtmfdetect");
-    //var sink = createElement ("autoaudiosink", "my_sink");
-    var sink = createElement ("fakesink", "my_sink");
+    var sink = createElement ("autoaudiosink", "my_sink");
+    //var sink = createElement ("fakesink", "my_sink");
 
     // Adding elements to pipeline
     addToPipeline(pipeline, filesrc);
@@ -160,11 +160,50 @@ void main (string[] args) {
             message.parse_tag (out tag_list);
             break;
         default:
+            print("default\n");
             break;
         }
 
         return true;
     });
+
+    //dd_bus.add_signal_watch();
+    // the below doesn't cause an error but we don't get any message
+    dd_bus.message.connect ((bus, message) => {
+        print("dd_bus message\n");
+        switch (message.type) {
+        case MessageType.ERROR:
+            GLib.Error err;
+            string debug;
+            message.parse_error (out err, out debug);
+            stdout.printf ("Error: %s\n", err.message);
+            loop.quit ();
+            break;
+        case MessageType.EOS:
+            stdout.printf ("end of stream\n");
+            break;
+        case MessageType.STATE_CHANGED:
+            Gst.State oldstate;
+            Gst.State newstate;
+            Gst.State pending;
+            message.parse_state_changed (out oldstate, out newstate,
+                                         out pending);
+            stdout.printf ("state changed: %s->%s:%s\n",
+                           oldstate.to_string (), newstate.to_string (),
+                           pending.to_string ());
+            break;
+        case MessageType.TAG:
+            Gst.TagList tag_list;
+            stdout.printf ("taglist found\n");
+            message.parse_tag (out tag_list);
+            break;
+        default:
+            print("default\n");
+            break;
+        }
+    });
+
+
 
     loop.run ();
 }
