@@ -21,3 +21,5 @@ test.vala:105:11: warning: assignment discards ‘const’ qualifier from pointe
            ^
 takeshi:dtmf_generation_and_detection$
 ```
+
+Obs: tests with RFC2833 are not working (only InBand digits are being detected)

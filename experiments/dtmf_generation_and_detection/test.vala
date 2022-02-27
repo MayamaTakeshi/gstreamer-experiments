@@ -34,7 +34,8 @@ void main (string[] args) {
     // Creating pipeline and elements
     var pipeline = new Pipeline ("test");
     //dynamic Element filesrc  = createElement("filesrc", "filesrc");
-    dynamic Element filesrc  = createElement("dtmfsrc", "dtmfsrc");
+    //filesrc.location = "./digits.wav";
+    dynamic Element dtmfsrc  = createElement("dtmfsrc", "dtmfsrc");
     dynamic Element decodebin = createElement ("decodebin", "decodebin");
     dynamic Element audioresample = createElement ("audioresample", "audioresample");
     dynamic Element audioconvert = createElement ("audioconvert", "audioconvert");
@@ -43,7 +44,7 @@ void main (string[] args) {
     //var sink = createElement ("fakesink", "my_sink");
 
     // Adding elements to pipeline
-    addToPipeline(pipeline, filesrc);
+    addToPipeline(pipeline, dtmfsrc);
     addToPipeline(pipeline, decodebin);
     addToPipeline(pipeline, audioresample);
     addToPipeline(pipeline, audioconvert);
@@ -51,7 +52,7 @@ void main (string[] args) {
     addToPipeline(pipeline, sink);
 
     // Linking elements
-    linkElements(filesrc, decodebin);
+    linkElements(dtmfsrc, decodebin);
 
     decodebin.pad_added.connect((src, new_pad) => {
 		Gst.Pad sink_pad = audioresample.get_static_pad ("sink");
@@ -84,8 +85,6 @@ void main (string[] args) {
     linkElements(audioresample, audioconvert);
     linkElements(audioconvert, dtmfdetect);
     linkElements(dtmfdetect, sink);
-
-    filesrc.location = "./digits.wav";
 
     // Set pipeline state to PLAYING
     pipeline.set_state (State.PLAYING);
@@ -145,13 +144,14 @@ void main (string[] args) {
         return true;
     });
 
+    var type = 0;
     var on_off = 0;
     var number = 0;
 
     GLib.Timeout.add(250, () => {
         //print("timeout\n");
         Gst.Structure s = new Gst.Structure.empty("dtmf-event");
-        s.set_value("type", 1);
+        s.set_value("type", type);
         s.set_value("number", number);
         s.set_value("volume", 25);
 
@@ -165,6 +165,11 @@ void main (string[] args) {
                 number = 0;
             }
             on_off = 0;
+            if(type == 0) {
+                type = 1;
+            } else {
+                type = 0;
+            }
         }
 
         //stdout.printf("number=%u, on_off=%u\n", number, on_off);
