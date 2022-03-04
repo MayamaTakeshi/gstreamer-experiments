@@ -66,7 +66,7 @@ void main (string[] args) {
 
 		// Check the new pad's type:
 		Gst.Caps new_pad_caps = new_pad.query_caps (null);
-		weak Gst.Structure new_pad_struct = new_pad_caps.get_structure(0);
+		unowned Gst.Structure new_pad_struct = new_pad_caps.get_structure(0);
 		string new_pad_type = new_pad_struct.get_name ();
 		if (!new_pad_type.has_prefix ("audio/x-raw")) {
 			print ("  It has type '%s' which is not raw audio. Ignoring.\n", new_pad_type);
@@ -101,7 +101,7 @@ void main (string[] args) {
         var src_obj = message.src;
 
         if (src_obj == dtmfdetect) {
-            weak Gst.Structure s = message.get_structure();
+            unowned Gst.Structure s = message.get_structure();
             var name = s.get_name();
             if(name != "GstMessageStateChanged") {
                 var type = s.get_value("type").strdup_contents();
@@ -173,7 +173,7 @@ void main (string[] args) {
         }
 
         //stdout.printf("number=%u, on_off=%u\n", number, on_off);
-        Gst.Event event = new Gst.Event.custom(Gst.EventType.CUSTOM_UPSTREAM, s.copy());
+        Gst.Event event = new Gst.Event.custom(Gst.EventType.CUSTOM_UPSTREAM, (owned) s);
         pipeline.send_event(event);
 
         return true;
